@@ -328,4 +328,191 @@ document.addEventListener('contextmenu', function(e) {
   return false;
 });
 
+// Touch events for mobile
+document.addEventListener('touchstart', function(e) {
+  if (e.touches.length > 0) {
+    mouseX = e.touches[0].clientX;
+    mouseY = e.touches[0].clientY;
+    mouseActive = true;
+    isMouseDown = true;
+    
+    // Long press to toggle mode (for mobile)
+    touchTimer = setTimeout(() => {
+      interactionMode = interactionMode === 'repel' ? 'attract' : 'repel';
+      
+      // Update instruction text
+      const modeText = document.getElementById('mode-text');
+      if (modeText) {
+        modeText.textContent = `Mode: ${interactionMode === 'repel' ? 'Push' : 'Pull'}`;
+      }
+      
+      // Provide haptic feedback if available
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+    }, 500);
+  }
+  e.preventDefault(); // Prevent scrolling while interacting
+});
+
+document.addEventListener('touchmove', function(e) {
+  if (e.touches.length > 0) {
+    mouseX = e.touches[0].clientX;
+    mouseY = e.touches[0].clientY;
+    mouseActive = true;
+  }
+  e.preventDefault(); // Prevent scrolling while interacting
+});
+
+document.addEventListener('touchend', function() {
+  isMouseDown = false;
+  clearTimeout(touchTimer);
+  
+  // Small delay before setting mouseActive to false
+  // This allows final animations to complete
+  setTimeout(() => {
+    mouseActive = false;
+  }, 100);
+});
+
+// Add keyboard controls for interaction mode
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'a' || e.key === 'A') {
+    interactionMode = 'attract';
+    updateModeText();
+  } else if (e.key === 'r' || e.key === 'R') {
+    interactionMode = 'repel';
+    updateModeText();
+  } else if (e.key === ' ') {
+    // Space bar toggles mode
+    interactionMode = interactionMode === 'repel' ? 'attract' : 'repel';
+    updateModeText();
+  }
+});
+
+function updateModeText() {
+  const modeText = document.getElementById('mode-text');
+  if (modeText) {
+    modeText.textContent = `Mode: ${interactionMode === 'repel' ? 'Push' : 'Pull'}`;
+  }
+}
+
+// Initialize and start animation
+initWebPoints();
+drawWeb();
+
+// Add better instructions for interaction
+const instructionsDiv = document.createElement('div');
+instructionsDiv.id = 'web-instructions';
+instructionsDiv.style.position = 'fixed';
+instructionsDiv.style.bottom = '20px';
+instructionsDiv.style.left = '20px';
+instructionsDiv.style.padding = '10px';
+instructionsDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+instructionsDiv.style.color = 'white';
+instructionsDiv.style.borderRadius = '5px';
+instructionsDiv.style.fontSize = '14px';
+instructionsDiv.style.zIndex = '1000';
+instructionsDiv.style.pointerEvents = 'none';
+instructionsDiv.style.transition = 'opacity 0.5s ease';
+
+
+
+
+// Show instructions when mouse is over the canvas
+canvas.addEventListener('mouseenter', function() {
+  instructionsDiv.style.opacity = '1';
+});
+
+// Hide instructions after inactivity
+let inactivityTimer;
+function resetInactivityTimer() {
+  clearTimeout(inactivityTimer);
+  instructionsDiv.style.opacity = '1';
+  
+  inactivityTimer = setTimeout(() => {
+    instructionsDiv.style.opacity = '0.2';
+  }, 5000);
+}
+
+document.addEventListener('mousemove', resetInactivityTimer);
+document.addEventListener('mousedown', resetInactivityTimer);
+document.addEventListener('keydown', resetInactivityTimer);
+document.addEventListener('touchstart', resetInactivityTimer);
+
+// Start the inactivity timer
+resetInactivityTimer();
+
+// Rest of your JavaScript remains the same
+// ...
+
+// Navigation menu toggle for mobile
+const menuToggle = document.querySelector('.menu-toggle');
+const nav = document.querySelector('nav');
+
+if (menuToggle && nav) {
+  menuToggle.addEventListener('click', function () {
+    nav.classList.toggle('active');
+    menuToggle.classList.toggle('active');
+    
+    // Animate hamburger to X
+    const bars = document.querySelectorAll('.bar');
+    if (menuToggle.classList.contains('active')) {
+      bars[0].style.transform = 'rotate(-45deg) translate(-5px, 6px)';
+      bars[1].style.opacity = '0';
+      bars[2].style.transform = 'rotate(45deg) translate(-5px, -6px)';
+    } else {
+      bars[0].style.transform = 'none';
+      bars[1].style.opacity = '1';
+      bars[2].style.transform = 'none';
+    }
+  });
+}
+
+// Close menu when clicking a link
+const navLinks = document.querySelectorAll('.nav-links a');
+navLinks.forEach((link) => {
+  link.addEventListener('click', function () {
+    if (nav) nav.classList.remove('active');
+    if (menuToggle) menuToggle.classList.remove('active');
+    
+    // Reset hamburger
+    const bars = document.querySelectorAll('.bar');
+    if (bars.length > 0) {
+      bars[0].style.transform = 'none';
+      bars[1].style.opacity = '1';
+      bars[2].style.transform = 'none';
+    }
+  });
+});
+
+// Change active link on scroll
+const sections = document.querySelectorAll('section');
+window.addEventListener('scroll', function () {
+  let current = '';
+  sections.forEach((section) => {
+    const sectionTop = section.offsetTop;
+    const sectionHeight = section.clientHeight;
+    if (pageYOffset >= sectionTop - sectionHeight / 3) {
+      current = section.getAttribute('id');
+    }
+  });
+  
+  navLinks.forEach((link) => {
+    link.classList.remove('active');
+    if (link.getAttribute('href') && link.getAttribute('href').substring(1) === current) {
+      link.classList.add('active');
+    }
+  });
+  
+  // Add background to header on scroll
+  const header = document.querySelector('header');
+  if (header) {
+    if (window.scrollY > 100) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  }
+});
 });
