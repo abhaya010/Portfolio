@@ -515,4 +515,209 @@ window.addEventListener('scroll', function () {
     }
   }
 });
+
+  // Skill bars animation
+  function animateSkills() {
+    const skillSection = document.querySelector('.skills');
+    const skillLevels = document.querySelectorAll('.skill-level');
+    
+    if (!skillSection) return;
+    
+    const sectionPos = skillSection.getBoundingClientRect().top;
+    const screenPos = window.innerHeight / 1.3;
+    
+    if (sectionPos < screenPos) {
+      skillLevels.forEach((level) => {
+        const width = level.getAttribute('data-width') || level.style.width;
+        level.style.width = width;
+      });
+    }
+  }
+  
+  // Initial animation check
+  animateSkills();
+  
+  // Check on scroll
+  window.addEventListener('scroll', animateSkills);
+  
+  // Project filtering
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const projectCards = document.querySelectorAll('.project-card');
+  
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Remove active class from all buttons
+      filterBtns.forEach(btn => btn.classList.remove('active'));
+      
+      // Add active class to clicked button
+      btn.classList.add('active');
+      
+      // Get filter value
+      const filterValue = btn.getAttribute('data-filter');
+      
+      // Filter projects
+      projectCards.forEach(card => {
+        if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+  
+  // Add animation classes to elements when they come into view
+  function animateOnScroll() {
+    const elements = document.querySelectorAll(
+      '.project-card, .about-content, .contact-container, .skills-container'
+    );
+    
+    elements.forEach((element) => {
+      const elementPosition = element.getBoundingClientRect().top;
+      const screenPosition = window.innerHeight / 1.3;
+      
+      if (elementPosition < screenPosition) {
+        element.classList.add('fade-in');
+      }
+    });
+  }
+  
+  // Run animation on scroll
+  window.addEventListener('scroll', animateOnScroll);
+  
+  // Run once on load
+  window.addEventListener('load', animateOnScroll);
+});
+
+// Add this to your existing script.js file or create a new one
+document.addEventListener('DOMContentLoaded', function() {
+  // Create and animate code particles
+  const codeParticles = document.querySelector('.code-particles');
+  if (!codeParticles) return;
+  
+  // Create additional particles dynamically
+  for (let i = 0; i < 15; i++) {
+    const particle = document.createElement('span');
+    particle.className = 'code-particle';
+    
+    // Random position
+    const posX = Math.random() * 100;
+    const posY = Math.random() * 100;
+    
+    // Random size
+    const size = Math.random() * 6 + 2;
+    
+    // Random animation delay
+    const delay = Math.random() * 5;
+    
+    // Set styles
+    particle.style.cssText = `
+      position: absolute;
+      top: ${posY}%;
+      left: ${posX}%;
+      width: ${size}px;
+      height: ${size}px;
+      background-color: var(--accent);
+      border-radius: 50%;
+      opacity: 0;
+      animation: particle-animation ${Math.random() * 2 + 2}s ease-in-out ${delay}s infinite;
+    `;
+    
+    codeParticles.appendChild(particle);
+  }
+  
+  // Add tech symbols that float around
+  const techSymbols = ['{ }', '< >', '/>', '[]', '()', '&&', '||', '==', '=>', '++', '**'];
+  
+  for (let i = 0; i < 8; i++) {
+    const symbol = document.createElement('div');
+    symbol.className = 'tech-symbol';
+    
+    // Random position
+    const posX = Math.random() * 100;
+    const posY = Math.random() * 100;
+    
+    // Random animation delay and duration
+    const delay = Math.random() * 5;
+    const duration = Math.random() * 10 + 10;
+    
+    // Random symbol
+    const symbolText = techSymbols[Math.floor(Math.random() * techSymbols.length)];
+    
+    // Set styles
+    symbol.style.cssText = `
+      position: absolute;
+      top: ${posY}%;
+      left: ${posX}%;
+      font-family: monospace;
+      font-size: ${Math.random() * 10 + 10}px;
+      color: var(--accent);
+      opacity: 0.6;
+      transform: rotate(${Math.random() * 360}deg);
+      animation: symbol-float ${duration}s ease-in-out ${delay}s infinite;
+    `;
+    
+    symbol.textContent = symbolText;
+    codeParticles.appendChild(symbol);
+  }
+  
+  // Add this keyframe to your CSS
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes symbol-float {
+      0%, 100% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 0.2;
+      }
+      25% {
+        transform: translate(${Math.random() * 30 - 15}px, ${Math.random() * 30 - 15}px) rotate(${Math.random() * 30}deg);
+        opacity: 0.7;
+      }
+      50% {
+        transform: translate(${Math.random() * 30 - 15}px, ${Math.random() * 30 - 15}px) rotate(${Math.random() * 60}deg);
+        opacity: 0.5;
+      }
+      75% {
+        transform: translate(${Math.random() * 30 - 15}px, ${Math.random() * 30 - 15}px) rotate(${Math.random() * 30}deg);
+        opacity: 0.7;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  // Make the animation interactive with mouse movement
+  const techAnimation = document.querySelector('.tech-animation');
+  if (techAnimation) {
+    techAnimation.addEventListener('mousemove', function(e) {
+      // Get mouse position relative to the animation container
+      const rect = techAnimation.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      // Calculate position relative to center (in percentage from -50 to 50)
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const offsetX = ((x - centerX) / centerX) * 20;
+      const offsetY = ((y - centerY) / centerY) * 20;
+      
+      // Apply 3D rotation based on mouse position
+      const orbitContainer = document.querySelector('.orbit-container');
+      if (orbitContainer) {
+        orbitContainer.style.transform = `rotateY(${offsetX}deg) rotateX(${-offsetY}deg)`;
+      }
+    });
+    
+    // Reset rotation when mouse leaves
+    techAnimation.addEventListener('mouseleave', function() {
+      const orbitContainer = document.querySelector('.orbit-container');
+      if (orbitContainer) {
+        orbitContainer.style.transform = '';
+        // Restart the rotation animation
+        orbitContainer.style.animation = 'none';
+        setTimeout(() => {
+          orbitContainer.style.animation = 'container-rotate 20s linear infinite';
+        }, 10);
+      }
+    });
+  }
 });
